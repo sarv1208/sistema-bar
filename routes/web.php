@@ -11,6 +11,18 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/migrate-db', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
+            '--force' => true,
+            '--seed' => true,
+        ]);
+        return 'Base de datos migrada y poblada con éxito!';
+    } catch (\Throwable $e) {
+        return 'Error al migrar: ' . $e->getMessage();
+    }
+});
+
 Route::get('/', function () {
     return view('auth.login');
 });
