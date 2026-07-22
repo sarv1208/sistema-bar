@@ -1,0 +1,65 @@
+{
+    "schema_version": "schema4",
+    "scraper_meta": [
+        {
+            "ingredient_name": "Jamaican Rum (overproof)",
+            "source": "Jamaican Rum (overproof)"
+        },
+        {
+            "ingredient_name": "Sweet Vermouth",
+            "source": "Sweet Vermouth"
+        },
+        {
+            "ingredient_name": "Campari",
+            "source": "Campari"
+        }
+    ],
+    "schema": {
+        "name": "Kingston Negroni",
+        "instructions": "Combine all ingredients and stir with ice. Strain into an ice-filled rocks glass.",
+        "created_at": null,
+        "description": "What happens when Campari and Italian Vermouth meet the sand and sun of the Caribbean? Well, that would be a Kingston Negroni. Overproof Jamaican Rum stands up to the bombastic chocolate and bitter orange notes in the vermouth while drying out the Campari\u2019s richness and tempering its bitterness.",
+        "source": "https:\/\/cocktailsdistilled.com\/recipe\/kingston-negroni\/",
+        "garnish": "Orange Slice",
+        "abv": null,
+        "tags": [],
+        "glass": "Rocks",
+        "method": "Stir",
+        "images": [
+            {
+                "uri": "TEST",
+                "placeholder_hash": null,
+                "copyright": "Cocktails Distilled"
+            }
+        ],
+        "ingredients": [
+            {
+                "name": "Jamaican Rum (overproof)",
+                "amount": 30,
+                "units": "ml",
+                "optional": false,
+                "amount_max": null,
+                "note": null,
+                "substitutes": []
+            },
+            {
+                "name": "Sweet Vermouth",
+                "amount": 30,
+                "units": "ml",
+                "optional": false,
+                "amount_max": null,
+                "note": null,
+                "substitutes": []
+            },
+            {
+                "name": "Campari",
+                "amount": 30,
+                "units": "ml",
+                "optional": false,
+                "amount_max": null,
+                "note": null,
+                "substitutes": []
+            }
+        ]
+    }
+}

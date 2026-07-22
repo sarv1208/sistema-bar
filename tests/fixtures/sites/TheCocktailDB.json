@@ -1,0 +1,68 @@
+{
+    "schema_version": "schema4",
+    "scraper_meta": [
+        {
+            "ingredient_name": "Gin",
+            "source": "1 oz "
+        },
+        {
+            "ingredient_name": "Campari",
+            "source": "1 oz "
+        },
+        {
+            "ingredient_name": "Sweet Vermouth",
+            "source": "1 oz "
+        }
+    ],
+    "schema": {
+        "name": "Negroni",
+        "instructions": "Stir into glass over ice, garnish and serve.",
+        "created_at": null,
+        "description": null,
+        "source": "https:\/\/www.thecocktaildb.com\/drink\/11003-Negroni",
+        "garnish": null,
+        "abv": null,
+        "tags": [
+            "IBA",
+            "Classic"
+        ],
+        "glass": "Old-fashioned glass",
+        "method": null,
+        "images": [
+            {
+                "uri": "TEST",
+                "placeholder_hash": null,
+                "copyright": "TheCocktailDB.com"
+            }
+        ],
+        "ingredients": [
+            {
+                "name": "Gin",
+                "amount": 1,
+                "units": "oz",
+                "optional": false,
+                "amount_max": null,
+                "note": null,
+                "substitutes": []
+            },
+            {
+                "name": "Campari",
+                "amount": 1,
+                "units": "oz",
+                "optional": false,
+                "amount_max": null,
+                "note": null,
+                "substitutes": []
+            },
+            {
+                "name": "Sweet Vermouth",
+                "amount": 1,
+                "units": "oz",
+                "optional": false,
+                "amount_max": null,
+                "note": null,
+                "substitutes": []
+            }
+        ]
+    }
+}

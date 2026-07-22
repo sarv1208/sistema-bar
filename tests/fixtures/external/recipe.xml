@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema4>
+  <name>Gin and Tonic</name>
+  <instructions>Cocktail instructions go here</instructions>
+  <created_at>2020-01-01T12:00:00+00:00</created_at>
+  <description>Cocktail description goes here</description>
+  <source>https://barassistant.app</source>
+  <garnish>Straw and lemon wheel</garnish>
+  <abv>32.3</abv>
+  <tags/>
+  <glass>Highball</glass>
+  <method>Shake</method>
+  <images>
+    <uri>http://localhost/uploads/tests/non_existing_image.jpg</uri>
+    <placeholder_hash></placeholder_hash>
+    <copyright>Exported copyright</copyright>
+  </images>
+  <ingredients>
+    <name>Gin</name>
+    <amount>45</amount>
+    <units>ml</units>
+    <optional></optional>
+    <amount_max>60</amount_max>
+    <note>Ingredient note</note>
+    <substitutes/>
+  </ingredients>
+</schema4>

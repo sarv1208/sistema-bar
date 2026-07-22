@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Kami\Cocktail\Rules;
+
+use Closure;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Validation\ValidationRule;
+
+class ResourceBelongsToBar implements ValidationRule
+{
+    public function __construct(private readonly int $barId, private readonly string $table, private readonly string $column = 'id')
+    {
+    }
+
+    /**
+     * Run the validation rule.
+     *
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     */
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if ($value && !is_array($value)) {
+            $value = [$value];
+        }
+
+        $value = (array) $value;
+
+        $count = DB::table($this->table)
+            ->select($this->column)
+            ->whereIn($this->column, $value)
+            ->where('bar_id', $this->barId)
+            ->count();
+
+        if ($count !== count((array) $value)) {
+            $fail('One or more of the selected resources do not belong to the specified bar');
+        }
+    }
+}

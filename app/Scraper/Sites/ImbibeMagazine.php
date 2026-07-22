@@ -1,0 +1,186 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Kami\Cocktail\Scraper\Sites;
+
+class ImbibeMagazine extends DefaultScraper
+{
+    #[\Override]
+    public static function getSupportedUrls(): array
+    {
+        return [
+            'https://imbibemagazine.com',
+        ];
+    }
+
+    #[\Override]
+    public function name(): string
+    {
+        return $this->getRecipeSchema()['name'] ?? parent::name();
+    }
+
+    #[\Override]
+    public function description(): ?string
+    {
+        $desc = $this->getRecipeSchema()['articleBody'] ?? parent::description();
+
+        return trim((string) $desc);
+    }
+
+    #[\Override]
+    public function source(): ?string
+    {
+        return $this->url;
+    }
+
+    #[\Override]
+    public function instructions(): ?string
+    {
+        $result = '';
+        $i = 1;
+        foreach ($this->getRecipeSchema()['recipeInstructions'] ?? [] as $step) {
+            $result .= $i . '. ' . trim((string) $step['text']) . "\n";
+            $i++;
+        }
+
+        if ($result === '') {
+            try {
+                $result = $this->crawler->filterXPath('//div[contains(@class, \'recipe__main-content\')]')->first()->filterXPath('//p[3]')->text();
+            } catch (\Throwable) {
+            }
+        }
+
+        return trim($result);
+    }
+
+    public function glass(): ?string
+    {
+        $result = null;
+
+        $this->crawler->filter('.ingredients__tools li')->each(function ($listItem) use (&$result) {
+            if (str_contains(strtolower((string) $listItem->text()), 'glass')) {
+                $result = $listItem->text();
+
+                $result = ucfirst(str_replace('Glass:', '', $result));
+            }
+        });
+
+        if ($result === null) {
+            foreach ($this->getLegacyRecipeIngredients() as $line) {
+                if (str_starts_with($line, 'Glass:')) {
+                    $result = (string) str_replace('Glass:', '', $line);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    #[\Override]
+    public function ingredients(): array
+    {
+        $result = [];
+
+        $schemaIngredients = $this->getRecipeSchema()['recipeIngredient'] ?? [];
+
+        foreach ($schemaIngredients as $ingredient) {
+            $result[] = $this->ingredientParser->parseLine($ingredient['ingredient']);
+        }
+
+        if (empty($result)) {
+            foreach ($this->getLegacyRecipeIngredients() as $line) {
+                if (str_starts_with($line, 'Tools:') || str_starts_with($line, 'Garnish:') || str_starts_with($line, 'Glass:')) {
+                    continue;
+                }
+                $result[] = $this->ingredientParser->parseLine($line);
+            }
+        }
+
+        return $result;
+    }
+
+    public function garnish(): ?string
+    {
+        $result = null;
+
+        $this->crawler->filter('.ingredients__tools li')->each(function ($listItem) use (&$result) {
+            if (str_contains(strtolower((string) $listItem->text()), 'garnish')) {
+                $result = $listItem->text();
+
+                $result = ucfirst(str_replace('Garnish:', '', $result));
+            }
+        });
+
+        if ($result === null) {
+            foreach ($this->getLegacyRecipeIngredients() as $line) {
+                if (str_starts_with($line, 'Garnish:')) {
+                    $result = (string) str_replace('Garnish:', '', $line);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    #[\Override]
+    public function image(): ?array
+    {
+        $schema = $this->getRecipeSchema();
+
+        $url = null;
+        $copyright = 'Imbibe Magazine';
+
+        $imageCredit = $this->crawler->filter('.recipe__image-credit');
+        if ($imageCredit->count() > 0) {
+            $copyright .= ' | ' . str_replace('Photo: ', '', $imageCredit->text(''));
+        }
+
+        if (!empty($schema)) {
+            $url = $schema['image'] ?? null;
+        } else {
+            $url = explode(' ', (string) $this->crawler->filter('img.recipe__image')->first()->attr('data-srcset'))[0];
+        }
+
+        return [
+            'uri' => $url,
+            'copyright' => $copyright,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getRecipeSchema(): array
+    {
+        $recipeSchema = [];
+
+        $this->crawler->filterXPath('//script[@type="application/ld+json"]')->each(function ($node) use (&$recipeSchema) {
+            $parsedSchema = json_decode((string) $node->text(), true);
+            if (array_key_exists('@type', $parsedSchema) && $parsedSchema['@type'] === 'Recipe') {
+                $recipeSchema = $parsedSchema;
+            }
+        });
+
+        return $recipeSchema;
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getLegacyRecipeIngredients(): array
+    {
+        $result = [];
+
+        try {
+            $ingredientsParagraph = $this->crawler->filterXPath('//div[contains(@class, \'recipe__main-content\')]')->first()->filterXPath('//p[2]')->html();
+            $ingredientsParagraphLines = explode('<br>', $ingredientsParagraph);
+            foreach ($ingredientsParagraphLines as $line) {
+                $result[] = trim($line);
+            }
+        } catch (\Throwable) {
+        }
+
+        return $result;
+    }
+}

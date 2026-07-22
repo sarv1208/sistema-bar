@@ -1,0 +1,120 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Kami\Cocktail\Models;
+
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Collection;
+use Kami\Cocktail\Models\Concerns\IsExternalized;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Kami\Cocktail\Exceptions\ImageFileNotFoundException;
+
+class Image extends BaseModel implements IsExternalized
+{
+    /** @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\ImageFactory> */
+    use HasFactory;
+
+    #[\Override]
+    public function delete(string $disk = 'uploads'): ?bool
+    {
+        $disk = Storage::disk($disk);
+
+        if ($disk->exists($this->file_path)) {
+            $disk->delete($this->file_path);
+        }
+
+        return parent::delete();
+    }
+
+    public function getImageUrl(): ?string
+    {
+        if (!$this->file_path) {
+            return null;
+        }
+
+        $disk = Storage::disk('uploads');
+
+        return $disk->url($this->file_path);
+    }
+
+    public function getImageThumbUrl(): ?string
+    {
+        if (!$this->file_path) {
+            return null;
+        }
+
+        return route('images.thumb', ['id' => $this->id], false);
+    }
+
+    public function getImageAsFileURI(): ?string
+    {
+        if (!$this->file_path) {
+            return null;
+        }
+
+        return 'file:///' . $this->getFileName();
+    }
+
+    public function getExternalId(): string
+    {
+        return $this->getFileName() ?? (string) $this->id;
+    }
+
+    public function getFileName(): ?string
+    {
+        if (!$this->file_path) {
+            return null;
+        }
+
+        return match ($this->imageable_type) {
+            Cocktail::class => str_replace('cocktails/' . $this->imageable->bar_id . '/', '', $this->file_path),
+            Ingredient::class => str_replace('ingredients/' . $this->imageable->bar_id . '/', '', $this->file_path),
+            default => null,
+        };
+    }
+
+    /**
+     * @return MorphTo<Ingredient|Cocktail, $this>
+     */
+    public function imageable(): MorphTo
+    {
+        /** @phpstan-ignore-next-line */
+        return $this->morphTo();
+    }
+
+    public function getPath(): string
+    {
+        $disk = Storage::disk('uploads');
+
+        if ($disk->exists($this->file_path)) {
+            return $disk->path($this->file_path);
+        }
+
+        throw new ImageFileNotFoundException('Image not found at path: ' . $this->file_path);
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getAllBarImages(int $barId): Collection
+    {
+        $cocktailImages = $this->where('imageable_type', Cocktail::class)
+            ->join('cocktails', 'cocktails.id', '=', 'images.imageable_id')
+            ->where('cocktails.bar_id', $barId)
+            ->get();
+
+        $ingredientImages = $this->where('imageable_type', Ingredient::class)
+            ->join('ingredients', 'ingredients.id', '=', 'images.imageable_id')
+            ->where('ingredients.bar_id', $barId)
+            ->get();
+
+        return $cocktailImages->merge($ingredientImages);
+    }
+
+    public function isTemporaryImage(): bool
+    {
+        return str_starts_with($this->file_path, 'temp/') || $this->imageable_id === null;
+    }
+}
