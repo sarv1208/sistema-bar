@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (request()->header('x-forwarded-proto') == 'https' || app()->environment('production')) {
+        if (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || request()->header('x-forwarded-proto') == 'https' || app()->environment('production')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
