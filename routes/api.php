@@ -75,8 +75,21 @@ Route::prefix('server')->group(function () {
 Route::get('/setup-database', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
+
+        $user = \Kami\Cocktail\Models\User::where('email', 'admin@gmail.com')->first();
+        if (!$user) {
+            $user = new \Kami\Cocktail\Models\User();
+            $user->email = 'admin@gmail.com';
+            $user->name = 'easydev ve';
+        }
+        $user->password = \Illuminate\Support\Facades\Hash::make('12345678');
+        $user->is_admin = true;
+        $user->email_verified_at = now();
+        $user->save();
+
         return response()->json([
             'status' => 'success',
+            'message' => 'Database reset successfully and admin user (admin@gmail.com / 12345678) created.',
             'output' => \Illuminate\Support\Facades\Artisan::output()
         ]);
     } catch (\Throwable $e) {
@@ -97,11 +110,12 @@ Route::get('/create-admin-user', function () {
         }
         $user->password = \Illuminate\Support\Facades\Hash::make('12345678');
         $user->is_admin = true;
+        $user->email_verified_at = now();
         $user->save();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'User admin@gmail.com password updated to: 12345678',
+            'message' => 'User admin@gmail.com created/updated with password: 12345678 and verified status.',
         ]);
     } catch (\Throwable $e) {
         return response()->json(['error' => $e->getMessage()], 500);

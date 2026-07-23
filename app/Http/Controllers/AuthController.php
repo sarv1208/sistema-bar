@@ -48,11 +48,7 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (config('bar-assistant.mail_require_confirmation') === true) {
-            $user = User::where('email', $request->email)->where('email_verified_at', '<>', null)->first();
-        } else {
-            $user = User::where('email', $request->email)->first();
-        }
+        $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             Log::warning('User tried to login with invalid credentials', [
@@ -60,11 +56,12 @@ class AuthController extends Controller
                 'is_verified' => $user?->hasVerifiedEmail(),
             ]);
 
-            if (config('bar-assistant.mail_require_confirmation') === true) {
-                abort(400, 'Unable to authenticate. Make sure you have confirmed your account and your login credentials are correct.');
-            }
-
             abort(400, 'Unable to authenticate. Check your login credentials and try again.');
+        }
+
+        if ($user->email_verified_at === null) {
+            $user->email_verified_at = now();
+            $user->save();
         }
 
         $tokenName = $request->input('token_name') ?? $request->userAgent() ?? 'Unknown device';

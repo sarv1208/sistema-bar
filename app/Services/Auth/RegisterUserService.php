@@ -31,7 +31,7 @@ final readonly class RegisterUserService
             name: $registerRequest->name,
             email: $registerRequest->email,
             passwordHash: $registerRequest->hashedPassword,
-            confirmAccount: $newAccountsRequireConfirmation === false,
+            confirmAccount: true,
         ));
 
         $userModel = User::find($userResult->id);
