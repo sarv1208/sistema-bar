@@ -74,7 +74,7 @@ Route::prefix('server')->group(function () {
 
 Route::get('/setup-database', function () {
     try {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
         return response()->json([
             'status' => 'success',
             'output' => \Illuminate\Support\Facades\Artisan::output()

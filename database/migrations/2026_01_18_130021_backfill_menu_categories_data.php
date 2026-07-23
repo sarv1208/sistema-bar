@@ -63,12 +63,10 @@ return new class () extends Migration {
         }
 
         Schema::table('menu_ingredients', function (Blueprint $table) {
-            $table->dropColumn('category_name');
-            $table->dropConstrainedForeignId('menu_id');
+            $table->dropColumn(['category_name', 'menu_id']);
         });
         Schema::table('menu_cocktails', function (Blueprint $table) {
-            $table->dropColumn('category_name');
-            $table->dropConstrainedForeignId('menu_id');
+            $table->dropColumn(['category_name', 'menu_id']);
         });
     }
 
