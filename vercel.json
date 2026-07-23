@@ -21,6 +21,10 @@
     }
   ],
   "env": {
+    "LOG_CHANNEL": "stderr",
+    "CACHE_STORE": "array",
+    "CACHE_DRIVER": "array",
+    "SESSION_DRIVER": "cookie",
     "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
     "APP_SERVICES_CACHE": "/tmp/storage/framework/services.php",
     "APP_PACKAGES_CACHE": "/tmp/storage/framework/packages.php",

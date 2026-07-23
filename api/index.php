@@ -9,6 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
+// Override read-only storage paths and drivers for Vercel serverless environment
+$_ENV['LOG_CHANNEL'] = 'stderr';
+putenv('LOG_CHANNEL=stderr');
+$_ENV['CACHE_STORE'] = 'array';
+putenv('CACHE_STORE=array');
+$_ENV['CACHE_DRIVER'] = 'array';
+putenv('CACHE_DRIVER=array');
+
 // Fix Vercel SCRIPT_NAME for Laravel route matching
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/../public/index.php';
