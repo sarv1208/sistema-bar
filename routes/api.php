@@ -83,7 +83,6 @@ Route::get('/setup-database', function () {
             $user->name = 'easydev ve';
         }
         $user->password = \Illuminate\Support\Facades\Hash::make('12345678');
-        $user->is_admin = true;
         $user->email_verified_at = now();
         $user->save();
 
@@ -109,7 +108,6 @@ Route::get('/create-admin-user', function () {
             $user->name = 'easydev ve';
         }
         $user->password = \Illuminate\Support\Facades\Hash::make('12345678');
-        $user->is_admin = true;
         $user->email_verified_at = now();
         $user->save();
 
