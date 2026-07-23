@@ -70,5 +70,16 @@ class Handler extends ExceptionHandler
             'type' => 'api_error',
             'message' => $e->getMessage(),
         ], 405));
+
+        $this->renderable(function (Throwable $e, $request) {
+            if ($request->is('api/*') || $request->wantsJson()) {
+                return response()->json([
+                    'type' => 'api_error',
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ], 500);
+            }
+        });
     }
 }
