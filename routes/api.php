@@ -87,6 +87,27 @@ Route::get('/setup-database', function () {
     }
 });
 
+Route::get('/create-admin-user', function () {
+    try {
+        $user = \Kami\Cocktail\Models\User::where('email', 'admin@gmail.com')->first();
+        if (!$user) {
+            $user = new \Kami\Cocktail\Models\User();
+            $user->email = 'admin@gmail.com';
+            $user->name = 'easydev ve';
+        }
+        $user->password = \Illuminate\Support\Facades\Hash::make('12345678');
+        $user->is_admin = true;
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User admin@gmail.com password updated to: 12345678',
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+
 Route::prefix('images')->group(function () {
     Route::get('/{id}/thumb', [ImageController::class, 'thumb'])->name('images.thumb');
 });
