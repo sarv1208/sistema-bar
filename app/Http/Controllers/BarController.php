@@ -118,7 +118,7 @@ class BarController extends Controller
 
         SetupBar::dispatch($barCreateResult->id, $request->user()->id, $barRequest->options);
 
-        return new Response(status: 201)->header('Location', route('bars.show', $barCreateResult->id, false));
+        return (new Response(status: 201))->header('Location', route('bars.show', $barCreateResult->id, false));
     }
 
     #[OAT\Put(path: '/bars/{id}', tags: ['Bars'], operationId: 'updateBar', description: 'Update a specific bar.', summary: 'Update bar', parameters: [

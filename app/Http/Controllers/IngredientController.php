@@ -169,7 +169,7 @@ class IngredientController extends Controller
             )
         );
 
-        return new Response()
+        return (new Response())
             ->setStatusCode(201)
             ->header('Location', route('ingredients.show', $ingredientResult->id, false));
     }
