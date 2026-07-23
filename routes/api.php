@@ -72,6 +72,21 @@ Route::prefix('server')->group(function () {
     Route::get('/openapi', [ServerController::class, 'openApi'])->name('openapi-spec');
 });
 
+Route::get('/setup-database', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'status' => 'success',
+            'output' => \Illuminate\Support\Facades\Artisan::output()
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
 Route::prefix('images')->group(function () {
     Route::get('/{id}/thumb', [ImageController::class, 'thumb'])->name('images.thumb');
 });
