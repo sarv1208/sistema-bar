@@ -9,6 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
+// Fix Vercel SCRIPT_NAME for Laravel route matching
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/../public/index.php';
+
 // Prepare /tmp storage for Vercel serverless environment
 $tmpStorage = '/tmp/storage';
 $directories = [
