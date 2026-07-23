@@ -88,6 +88,7 @@ Route::get('/setup-database', function () {
 
         return response()->json([
             'status' => 'success',
+            'version' => 'v2-no-is-admin',
             'message' => 'Database reset successfully and admin user (admin@gmail.com / 12345678) created.',
             'output' => \Illuminate\Support\Facades\Artisan::output()
         ]);
