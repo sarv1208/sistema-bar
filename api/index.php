@@ -22,7 +22,7 @@ putenv('CACHE_DRIVER=array');
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/../public/index.php';
 
-// Prepare /tmp storage for Vercel serverless environment
+// Prepare writable /tmp storage for Vercel serverless environment
 $tmpStorage = '/tmp/storage';
 $directories = [
     $tmpStorage . '/framework/views',
@@ -30,6 +30,10 @@ $directories = [
     $tmpStorage . '/framework/sessions',
     $tmpStorage . '/bootstrap/cache',
     $tmpStorage . '/logs',
+    $tmpStorage . '/bar-assistant',
+    $tmpStorage . '/bar-assistant/exports',
+    $tmpStorage . '/bar-assistant/uploads',
+    $tmpStorage . '/bar-assistant/temp',
 ];
 
 foreach ($directories as $directory) {
@@ -38,13 +42,32 @@ foreach ($directories as $directory) {
     }
 }
 
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+// Force writable /tmp storage path for Vercel
+$app->useStoragePath($tmpStorage);
+
 try {
-    require __DIR__ . '/../public/index.php';
+    $kernel = $app->make(Kernel::class);
+
+    $response = $kernel->handle(
+        $request = Request::capture()
+    )->send();
+
+    $kernel->terminate($request, $response);
 } catch (\Throwable $e) {
     http_response_code(500);
     header('Content-Type: application/json');
     echo json_encode([
-        'error' => $e->getMessage(),
+        'status' => 'error',
+        'message' => $e->getMessage(),
         'file' => $e->getFile(),
         'line' => $e->getLine(),
     ]);
