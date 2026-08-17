@@ -26,16 +26,20 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
-        if (Schema::hasTable('settings')) {
-            $settings = Setting::first();
+        try {
+            if (Schema::hasTable('settings')) {
+                $settings = Setting::first();
 
-            if ($settings && $settings->timezone) {
-                // 1. Sobreescribe la zona horaria de la configuración
-                Config::set('app.timezone', $settings->timezone);
+                if ($settings && $settings->timezone) {
+                    // 1. Sobreescribe la zona horaria de la configuración
+                    Config::set('app.timezone', $settings->timezone);
 
-                // 2. Establece la zona horaria en PHP para funciones nativas
-                date_default_timezone_set($settings->timezone);
+                    // 2. Establece la zona horaria en PHP para funciones nativas
+                    date_default_timezone_set($settings->timezone);
+                }
             }
+        } catch (\Throwable $e) {
+            // Evitar que la app colapse si la base de datos está inaccesible o en mantenimiento
         }
     }
 }
